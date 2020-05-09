@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_quiz_questions.*
 import org.w3c.dom.Text
@@ -32,15 +33,22 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
         tv_option_two.setOnClickListener(this)
         tv_option_three.setOnClickListener(this)
         tv_option_four.setOnClickListener(this)
+        btn_submit.setOnClickListener(this)
 
 
     }
 
     private fun setQuestion(){
-        mCurrentPosition = 1
+
         val question  = mQuestionList!![mCurrentPosition - 1] //-1 cause arrays starts at 0
 
         defaultOptionView()
+
+        if(mCurrentPosition == mQuestionList!!.size){
+            btn_submit.text = "Terminer"
+        }else{
+            btn_submit.text = "Envoyer"
+        }
 
         progressBar.progress = mCurrentPosition
         tv_progress.text = "$mCurrentPosition" + "/" + progressBar.max
@@ -79,6 +87,31 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
+    private fun answerView(answer: Int, drawableView: Int){
+        when(answer){
+            1 -> {
+                tv_option_one.background = ContextCompat.getDrawable(
+                    this, drawableView
+                )
+            }
+            2 -> {
+                tv_option_two.background = ContextCompat.getDrawable(
+                    this, drawableView
+                )
+            }
+            3 -> {
+                tv_option_three.background = ContextCompat.getDrawable(
+                    this, drawableView
+                )
+            }
+            4 -> {
+                tv_option_four.background = ContextCompat.getDrawable(
+                    this, drawableView
+                )
+            }
+        }
+    }
+
     override fun onClick(v: View?) {
 
         when(v?.id){
@@ -94,8 +127,34 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
             R.id.tv_option_four -> {
                 selectedOptionView(tv_option_four, 4)
             }
-        }
+            R.id.btn_submit -> {
+                if(mSelectedOptionPosition == 0){
+                    mCurrentPosition ++
 
+                    when{
+                        // tant qu'il reste des questions on actualise l'écran
+                        mCurrentPosition <= mQuestionList!!.size -> {
+                            setQuestion() // avec une nouvelle quesion
+                        } else -> {
+                            Toast.makeText(this, "You have finished the Game !", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }else{
+                    val question = mQuestionList?.get(mCurrentPosition - 1)
+                    if(question!!.CorrectAnswer != mSelectedOptionPosition){ // if we select the incorect option
+                        answerView(mSelectedOptionPosition, R.drawable.wrong_option_border) // bg get red
+                    }
+                    answerView(question.CorrectAnswer, R.drawable.correct_option_border)
+
+                    if(mCurrentPosition == mQuestionList!!.size){
+                        btn_submit.text = "Terminer"
+                    }else {
+                        btn_submit.text = "Question suivante"
+                    }
+                    mSelectedOptionPosition = 0
+                }
+            }
+        }
     }
 
 }
