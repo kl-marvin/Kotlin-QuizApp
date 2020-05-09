@@ -1,5 +1,6 @@
 package fr.kotlin.quizzapp
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
@@ -19,13 +20,18 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
     private var mCurrentPosition: Int = 1
     private var mQuestionList: ArrayList<Question>? = null
     private var mSelectedOptionPosition : Int = 0
+    private var mCorrectAnswers: Int = 0
+    private var userName: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz_questions)
 
-        mQuestionList = Constants.getQuestions()
+        mQuestionList = Constants.getQuestions() // return an arrayList of Questions used later on
+
+        // on récupère l'user name de l'activité Main
+        userName = intent.getStringExtra(Constants.USER_NAME)
 
         setQuestion()
 
@@ -135,14 +141,20 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
                         // tant qu'il reste des questions on actualise l'écran
                         mCurrentPosition <= mQuestionList!!.size -> {
                             setQuestion() // avec une nouvelle quesion
-                        } else -> {
-                            Toast.makeText(this, "You have finished the Game !", Toast.LENGTH_SHORT).show()
+                        } else -> { // quand il n'y a plus de question on démarre ResultActivity
+                         var intent = Intent(this, ResultActivity::class.java)
+                         intent.putExtra(Constants.USER_NAME, userName)
+                         intent.putExtra(Constants.CORRECT_ANSWERS, mCorrectAnswers)
+                         intent.putExtra(Constants.TOTAL_QUESTIONS, mQuestionList!!.size)
+                         startActivity(intent)
                         }
                     }
                 }else{
                     val question = mQuestionList?.get(mCurrentPosition - 1)
                     if(question!!.CorrectAnswer != mSelectedOptionPosition){ // if we select the incorect option
                         answerView(mSelectedOptionPosition, R.drawable.wrong_option_border) // bg get red
+                    }else{
+                        mCorrectAnswers++
                     }
                     answerView(question.CorrectAnswer, R.drawable.correct_option_border)
 

@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity() {
 
             }else{
                 val intent = Intent(this, QuizQuestionsActivity::class.java)
+                // on recupère la valeur du pseudo pour la passer à QuizActivity
+                intent.putExtra(Constants.USER_NAME, et_pseudo.text.toString())
                 startActivity(intent)
                 finish()
             }
