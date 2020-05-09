@@ -70,6 +70,7 @@
             android:gravity="center"
             android:textSize="18sp"
             android:padding="20dp"
+            android:textColorHint="@color/darkGrey"
             android:textColor="@color/darkGrey"
             tools:text="Argentina"/>
         <TextView
